@@ -1,0 +1,56 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>JustChating</title>
+    <meta charset="utf-8" />
+</head>
+<body>
+    <div id="app">
+        <textarea v-model="message"></textarea>
+        <br />
+        <button v-on:click="sendMess(message)">Отправить</button>
+        <button v-on:click="redirectToLogin()">Login</button>
+    </div>
+</body>
+<script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+<script>
+    //позже добавить проверку на шифрование https ? wss : ws
+    let port = ":" + document.location.port;
+    let url = "wss://" + document.location.hostname + port + "/ws";
+    let socket = new WebSocket(url);
+
+    socket.onopen = function (e) {
+        alert("Соединение установлено");
+    }
+    socket.onclose = function (e) {
+        alert('Соединение прервано');
+    }
+    socket.onmessage = function (e) {
+        alert(e.data);
+    }
+
+    window.addEventListener('unload', () => socket.close(1000, "Conection erased"));
+</script>
+<script>
+    Vue.createApp({
+        data() {
+            return {
+                message : '',
+            }
+        },
+        methods: {
+            sendMess(message) {
+                console.log(message);
+                socket.send(message);
+                return false;
+            },
+            redirectToLogin() {
+                let port = ":" + document.location.port;
+                let url = "https://" + document.location.hostname + port + "@Url.Action("Login", "Main")";
+                socket.close(1000, "Conection erased");
+                window.location.href = url;
+            }
+        }
+    }).mount('#app');
+</script>
+</html>
